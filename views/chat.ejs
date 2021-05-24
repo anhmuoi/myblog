@@ -1,0 +1,66 @@
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+<link rel="stylesheet" href="/stylesheets/chatt.css">
+<!DOCTYPE html>
+<html>
+    <body>
+        <div class="col-sm-3 col-sm-offset-4 frame">
+            <ul id="conservation"></ul>
+            <div>
+                <div class="msj-rta macro">                        
+                    <div class="text text-r" style="background:whitesmoke !important">
+                        <input id="message" class="mytext" placeholder="Type a message"/>
+                    </div> 
+
+                </div>
+                <div id="btn_send" style="padding:10px;">
+                    <span  class="glyphicon glyphicon-share-alt"></span>
+                </div>                
+            </div>
+        </div>       
+        
+        <script src="https://cdn.socket.io/4.1.1/socket.io.min.js" integrity="sha384-cdrFIqe3RasCMNE0jeFG9xJHog/tgOVC1E9Lzve8LQN1g5WUHo0Kvk1mawWjxX7a" crossorigin="anonymous"></script>
+
+        <script type="text/javascript">
+            var socket = io("http://localhost:4000");
+
+            socket.on("connect",function(){
+                console.log("user is connecting to server");
+
+                var username = prompt("What is your name?");
+
+                socket.emit("adduser",username);
+
+            });
+
+            //listen update message
+            socket.on("update_message",function(data){
+                $('#conservation').append("<li> <b>" + data.sender + "</b>: " + data.message + " </li>")
+            });
+
+            //send message event
+            $('#btn_send').click(function(event){
+                var message = $('#message').val();
+                $('#message').val("");
+                if(message.trim().length != 0)
+                {
+                    socket.emit("send_message",message);
+                    
+                }
+            });
+
+
+            //click enter
+            $("#message").keypress(function(event){
+                if(event.which == 13)
+                {
+                    $('#btn_send').trigger('click');
+                }
+            });
+
+        </script>
+    </body>
+
+</html>
